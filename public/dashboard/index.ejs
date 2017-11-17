@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OpenCPS Login</title>
+  <style>
+
+.login-page {
+  width: 360px;
+  padding: 8% 0 0;
+  margin: auto;
+}
+.form {
+  position: relative;
+  z-index: 1;
+  background: #FFFFFF;
+  max-width: 360px;
+  margin: 0 auto 100px;
+  padding: 45px;
+  text-align: center;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+.form input {
+  font-family: "Roboto", sans-serif;
+  outline: 0;
+  background: #f2f2f2;
+  width: 100%;
+  border: 0;
+  margin: 0 0 15px;
+  padding: 15px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+#info{
+  display: none;
+}
+.form button {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  outline: 0;
+  background: #1E88E5;
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  color: #FFFFFF;
+  font-size: 14px;
+  -webkit-transition: all 0.3 ease;
+  transition: all 0.3 ease;
+  cursor: pointer;
+}
+.form button:hover,.form button:active,.form button:focus {
+  background: #1E88E5;
+}
+.form .message {
+  margin: 15px 0 0;
+  color: #b3b3b3;
+  font-size: 12px;
+}
+.form .message a {
+  color: #4CAF50;
+  text-decoration: none;
+}
+.form .register-form {
+  display: none;
+}
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 300px;
+  margin: 0 auto;
+}
+.container:before, .container:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.container .info {
+  margin: 50px auto;
+  text-align: center;
+}
+.container .info h1 {
+  margin: 0 0 15px;
+  padding: 0;
+  font-size: 36px;
+  font-weight: 300;
+  color: #1a1a1a;
+}
+.container .info span {
+  color: #4d4d4d;
+  font-size: 12px;
+}
+.container .info span a {
+  color: #000000;
+  text-decoration: none;
+}
+.container .info span .fa {
+  color: #1E88E5;
+}
+body {
+  background: #1E88E5; /* fallback for old browsers */
+
+}
+  </style>
+
+  <script src="/dashboard/ihm/toast/js/jquery.min.js"></script>
+  <script src="/dashboard/ihm/toast/js/jquery.toast.js"></script>
+  <link href="/dashboard/ihm/toast/css/jquery.toast.css" id="theme" rel="stylesheet">
+
+
+  <script type="text/javascript"> // the language attribute is deprecated
+  var uri = window.location.toString();
+  if (uri.indexOf("?") > 0) {
+      var clean_uri = uri.substring(0, uri.indexOf("?"));
+      window.history.replaceState({}, document.title, clean_uri);
+  }
+  </script>
+
+<script>
+
+<% if(session=='TimeOut'){ %>
+$(window).on('load', function () {
+  $.toast({
+    heading: 'Information',
+    text: 'Time out, please enter your login ',
+    showHideTransition: 'slide',
+    icon: 'info',
+    position: 'top-right',
+    stack: false
+  })
+});
+<% } %>
+<% if(session=='logout'){ %>
+$(window).on('load', function () {
+  $.toast({
+    heading: 'Information',
+    text: 'Session Closed',
+    showHideTransition: 'slide',
+    icon: 'info',
+    position: 'top-right',
+    stack: false
+  })
+});
+<% } %>
+$(document).ready(function(){
+
+        var user,pass;
+
+        $("#submit").click(function(){
+          user=$("#user").val();
+          pass=$("#password").val();
+          $.post("api/authenticate",{name: user,password: pass}, function(data){
+            console.log(data);
+		if(data.success){
+			 location.href = "api/dashboard?token="+data.token;
+     }
+     else {
+       $("#info").css('display','inline');
+       $("#info").text(data.message);
+     }
+          });
+        });
+      });
+
+
+</script>
+
+</head>
+<body>
+
+<div class="login-page">
+
+  <div class="form">
+  <h2> OpenCPS Login</h2>
+    <form class="login-form">
+      <button type="button" id="info"></button>
+      <input type="text" id="user" name="name" placeholder="username"/>
+      <input type="password" id="password" name="password" placeholder="password"/>
+      <button type="button" id="submit">login</button>
+
+    </form>
+  </div>
+</div>
+</div>
+
+</body>
+</html>

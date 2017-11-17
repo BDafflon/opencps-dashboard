@@ -414,9 +414,7 @@ textarea {
 }
 
 input[type="radio"]:disabled,
-input[type="checkbox"]:disabled {
-  cursor: not-allowed;
-}
+
 
 input[type="date"],
 input[type="time"],

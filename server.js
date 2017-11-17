@@ -8,7 +8,7 @@ var morgan      = require('morgan');
 var mongoose    = require('mongoose');
 var session = require('express-session');
 var multer  = require('multer');
-
+var url = require('url');
 var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config'); // get our config file
 var User   = require('./app/models/user'); // get our mongoose model
@@ -94,14 +94,17 @@ app.get('/setupcps', function(req, res) {
 
 // basic route (http://localhost:8080)
 app.get('/', function(req, res) {
+	var q = url.parse(req.url, true);
+	var qdata = q.query;
+
 	//res.send('Hello! The API is at http://localhost:' + port + '/api');
-	res.sendFile(path.join(__dirname+'/public/dashboard/index.html'));
+	res.render(path.join(__dirname+'/public/dashboard/index'),{session:qdata.session});
 });
 
 app.get('/logout', function(req, res) {
 	//res.send('Hello! The API is at http://localhost:' + port + '/api');
 	req.session.destroy();
-	res.sendFile(path.join(__dirname+'/public/dashboard/index.html'));
+		res.redirect('/?session=logout');
 });
 
 // ---------------------------------------------------------
@@ -281,7 +284,7 @@ apiRoutes.get('/profile', function(req,res){
 	}
 	else
 	{
-		res.redirect('/');
+		res.redirect('/?session=TimeOut');
 	}
 
 });
@@ -303,7 +306,7 @@ apiRoutes.get('/map', function(req,res){
 	}
 	else
 	{
-		res.redirect('/');
+		res.redirect('/?session=TimeOut');
 	}
 
 });
@@ -325,7 +328,7 @@ apiRoutes.get('/alert', function(req,res){
 	}
 	else
 	{
-		res.redirect('/');
+		res.redirect('/?session=TimeOut');
 	}
 
 });
@@ -348,11 +351,14 @@ apiRoutes.get('/network', function(req,res){
 	}
 	else
 	{
-		res.redirect('/');
+		res.redirect('/?session=TimeOut');
 	}
 });
 
 apiRoutes.get('/cpsunit', function(req,res){
+	var q = url.parse(req.url, true);
+	var qdata = q.query;
+
 	if(req.session.user){
 		User.find({}, function(err, users) {
 			console.log("sessions data"+req.session.name);
@@ -364,14 +370,14 @@ apiRoutes.get('/cpsunit', function(req,res){
 				console.log("CPS : "+cpsList.length);
 				console.log("cpsID "+req.param('cpsid'))
 
-				res.render(path.join(__dirname+'/public/dashboard/cpsunit'),{token:req.session.token, user:req.session.user, cps:cpsList});
+				res.render(path.join(__dirname+'/public/dashboard/cpsunit'),{action:qdata.action, token:req.session.token, user:req.session.user, cps:cpsList});
 			});
 
 		});
 	}
 	else
 	{
-		res.redirect('/');
+		res.redirect('/?session=TimeOut');
 	}
 });
 
@@ -394,7 +400,7 @@ apiRoutes.get('/sensor', function(req,res){
 	}
 	else
 	{
-		res.redirect('/');
+		res.redirect('/?session=TimeOut');
 	}
 });
 
@@ -416,7 +422,7 @@ apiRoutes.get('/dashboard',function(req, res) {
 	}
 	else
 	{
-		res.redirect('/');
+		res.redirect('/?session=TimeOut');
 	}
 });
 
