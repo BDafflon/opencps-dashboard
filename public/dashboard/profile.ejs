@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<% include ./ihm/include/head.ejs %>
+
+<style>
+.form {
+  position: relative;
+  z-index: 1;
+  background: #FFFFFF;
+  max-width: 360px;
+
+  text-align: center;
+
+}
+.form input {
+  font-family: "Roboto", sans-serif;
+  outline: 0;
+  background: #f2f2f2;
+  width: 100%;
+  border: 0;
+  margin: 0 0 13px;
+  padding: 5px;
+  box-sizing: border-box;
+  font-size: 12px;
+}
+.form button {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  outline: 0;
+  background: #1E88E5;
+  width: 100%;
+  border: 0;
+  padding: 10px;
+  color: #FFFFFF;
+  font-size: 14px;
+  -webkit-transition: all 0.3 ease;
+  transition: all 0.3 ease;
+  cursor: pointer;
+}
+.form button:hover,.form button:active,.form button:focus {
+  background: #1E88E5;
+}
+</style>
+
+<script>
+$(document).ready(function(){
+        var user,mail,password,passwordConfirmation;
+				console.log("post");
+        $("#submit-data-user").click(function(){
+          name=$("#nameUser").val();
+					mail=$("#mail").val();
+          password=$("#pass1").val();
+					passwordConfirmation=$("#pass2").val();
+          $.post("/api/updateUser?token=<%=token%>",{name: name, mail:mail, password:password, passwordConfirmation: passwordConfirmation}, function(data){
+            console.log(data);
+		if(data.success)
+			 location.href = "/api/profile?token=<%=token%>";
+          });
+        });
+      });
+
+
+</script>
+
+</head>
+
+<body class="fix-header fix-sidebar card-no-border">
+
+	<% include ./ihm/include/header.ejs %>
+
+    <!-- ============================================================== -->
+    <!-- Preloader - style you can find in spinners.css -->
+    <!-- ============================================================== -->
+
+        <!-- ============================================================== -->
+        <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- Page wrapper  -->
+        <!-- ============================================================== -->
+        <div class="page-wrapper">
+            <!-- ============================================================== -->
+            <!-- Container fluid  -->
+            <!-- ============================================================== -->
+            <div class="container-fluid">
+                <!-- ============================================================== -->
+                <!-- Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+                <div class="row page-titles">
+                    <div class="col-md-5 col-8 align-self-center">
+                        <h3 class="text-themecolor">Dashboard</h3>
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+                            <li class="breadcrumb-item active">Profile</li>
+                        </ol>
+                    </div>
+
+                </div>
+                <!-- ============================================================== -->
+                <!-- End Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+                <!-- ============================================================== -->
+                <!-- Start Page Content -->
+                <!-- ============================================================== -->
+                <!-- Row -->
+                <div class="row">
+                    <!-- Column -->
+
+
+<div class="col-lg-8 col-md-7">
+	<div class="card">
+			<div class="card-block">
+					<div class="row">
+							<div class="col-12">
+									<div class="d-flex flex-wrap">
+											<div>
+													<h3 class="card-title">Profile Informations</h3>
+													<h6 class="card-subtitle"><%= user.name %></h6> </div>
+											<div class="ml-auto">
+
+											</div>
+									</div>
+							</div>
+							<div class="col-12">
+									<form id="dataUser" class="form">
+											Name  : <input type="text" id="nameUser" name="name" value="<%= user.name %>" />
+											E-mail  : <input type="email" id="mail" name="email" value="<%= user.mail %>" />
+											Password  : <input type="password" id="pass1" name="password" />
+											Password (confirmation)  : <input id="pass2" type="password" name="password2" />
+											<button type="button" class="input-file-trigger" id="submit-data-user">submit</button>
+									</form>
+							</div>
+					</div>
+			</div>
+	</div>
+                    </div>
+                    <div class="col-lg-4 col-md-5">
+                        <div class="card">
+                            <div class="card-block">
+                                <h3 class="card-title">Profile avatar </h3>
+                                <h6 class="card-subtitle"></h6>
+																<div>
+		                                <hr class="m-t-0 m-b-0">
+		                            </div>
+                                <div  >
+																	<img style="display: block; margin-top:15px; margin-left: auto; margin-right: auto;" src="/dashboard/ihm/images/users/avatar.png" width:100% />
+																</div>
+                            </div>
+                            <div>
+                                <hr class="m-t-0 m-b-0">
+                            </div>
+                            <div class="card-block text-center ">
+															<div class="form">
+  <input class="input-file" id="my-file" type="file">
+
+	<button type="button" class="input-file-trigger" id="submit">uplaod</button>
+</div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- End PAge Content -->
+                <!-- ============================================================== -->
+            </div>
+            <!-- ============================================================== -->
+            <!-- End Container fluid  -->
+            <!-- ============================================================== -->
+            <!-- ============================================================== -->
+            <!-- footer -->
+            <!-- ============================================================== -->
+
+<% include ./ihm/include/footer.ejs %>
