@@ -45,17 +45,82 @@
 
 <script>
 $(document).ready(function(){
-        var user,mail,password,passwordConfirmation;
-				console.log("post");
-        $("#submit-data-user").click(function(){
+        var user,mail,password,passwordConfirmation,file;
+
+        $("#submit-data-user").click(function( e ){
+            var ev = e;
           name=$("#nameUser").val();
 					mail=$("#mail").val();
           password=$("#pass1").val();
 					passwordConfirmation=$("#pass2").val();
           $.post("/api/updateUser?token=<%=token%>",{name: name, mail:mail, password:password, passwordConfirmation: passwordConfirmation}, function(data){
             console.log(data);
-		if(data.success)
-			 location.href = "/api/profile?token=<%=token%>";
+        		if(data.success) {
+              ev.preventDefault();
+              console.log(ev)
+              $.toast({
+                heading: 'Success',
+                text: 'Informations profile updated',
+                showHideTransition: 'slide',
+                icon: 'success',
+                position: 'top-right',
+                stack: false
+              })
+            }else{
+              ev.preventDefault();
+              console.log(ev)
+              $.toast({
+                heading: 'Error',
+                text: data.message,
+                showHideTransition: 'slide',
+                icon: 'error',
+                position: 'top-right',
+                stack: false
+              })
+            }
+        			 //location.href = "/api/profile?token=<%=token%>";
+          });
+        });
+
+
+        $("#submit-avatar-user").click(function( e ){
+            var ev = e;
+            var form = new FormData($("#uploadForm")[0]);
+            $.ajax({
+                  url: "/api/uploadAvatar?token=<%=token%>",
+                  method: "POST",
+                  dataType: 'json',
+                  data: form,
+                  processData: false,
+                  contentType: false,
+                  success: function(data){
+                    if(data.success){
+                      $("#avatarImg").attr("src", "/dashboard/ihm/images/users/<%= user._id %>.png?"+ new Date().getTime());
+                      $("#avatarUserMini").attr("src", "/dashboard/ihm/images/users/<%= user._id %>.png?"+ new Date().getTime());
+                      $.toast({
+                        heading: 'Success',
+                        text: data.message,
+                        showHideTransition: 'slide',
+                        icon: 'success',
+                        position: 'top-right',
+                        stack: false
+                      })
+
+                    }else{
+                      ev.preventDefault();
+                      console.log(data)
+                      $.toast({
+                        heading: 'Error',
+                        text: data.message,
+                        showHideTransition: 'slide',
+                        icon: 'error',
+                        position: 'top-right',
+                        stack: false
+                      })
+                    }
+
+                  },
+                  error: function(er){}
           });
         });
       });
@@ -144,7 +209,7 @@ $(document).ready(function(){
 		                                <hr class="m-t-0 m-b-0">
 		                            </div>
                                 <div  >
-																	<img style="display: block; margin-top:15px; margin-left: auto; margin-right: auto;" src="/dashboard/ihm/images/users/avatar.png" width:100% />
+																	<img id="avatarImg" style="display: block; width: 150px; margin-top:15px; margin-left: auto; margin-right: auto;" src="/dashboard/ihm/images/users/<%= user._id %>.png" width:100% />
 																</div>
                             </div>
                             <div>
@@ -152,9 +217,11 @@ $(document).ready(function(){
                             </div>
                             <div class="card-block text-center ">
 															<div class="form">
-  <input class="input-file" id="my-file" type="file">
+                                <form id="uploadForm" action="/api/uploadAvatar?token=<%=token%>" enctype="multipart/form-data" method="post">
+  <input class="input-file" id="avatar" name="avatar" type="file">
 
-	<button type="button" class="input-file-trigger" id="submit">uplaod</button>
+	<button type="button" class="input-file-trigger" id="submit-avatar-user">uplaod</button>
+</form>
 </div>
 
                             </div>

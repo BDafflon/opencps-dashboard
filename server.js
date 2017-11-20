@@ -6,19 +6,40 @@ var app         = express();
 var bodyParser  = require('body-parser');
 var morgan      = require('morgan');
 var mongoose    = require('mongoose');
-var session = require('express-session')
- var multer = require('multer');
+var session = require('express-session');
+var multer  = require('multer');
+
 var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config'); // get our config file
 var User   = require('./app/models/user'); // get our mongoose model
 var Cps = require('./app/models/cps');
 var path    = require("path");
-
+var fs = require('fs');
 // =================================================================
 // configuration ===================================================
 // =================================================================
 var port = process.env.PORT || 8080; // used to create, sign, and verify tokens
 var sessionUser;
+
+var storage = multer.diskStorage({
+	destination: function(req, file, callback) {
+		callback(null, path.join(__dirname+'/public/dashboard/ihm/images/users'))
+	},
+	filename: function(req, file, callback) {
+			callback(null, req.session.user._id  + path.extname(file.originalname))
+	}
+})
+
+var upload = multer({storage: storage,
+										fileFilter: function (req, file, callback) {
+										var ext = path.extname(file.originalname);
+										if(ext !== '.png') {
+											callback(new Error('Only png images are allowed'))
+										}else{
+										callback(null, true)
+									}
+									}
+}).single('avatar');
 
 mongoose.connect(config.database); // connect to database
 app.set('superSecret', config.secret); // secret variable
@@ -33,27 +54,6 @@ app.use(bodyParser.json());
 // use morgan to log requests to the console
 app.use(morgan('dev'));
 
-var Storage = multer.diskStorage({
-
-		destination: function(req, file, callback) {
-
-				callback(null, path.join(__dirname, '/public/dashboard/ihm/images/users'));
-
-		},
-
-		filename: function(req, file, callback) {
-
-				callback(null, req.session._id);
-
-		}
-
-});
-
-var upload = multer({
-
-		storage: Storage
-
-}).array("imgUploader", 3); //Field name and max count
 
 
 // =================================================================
@@ -114,21 +114,22 @@ var apiRoutes = express.Router();
 // ---------------------------------------------------------
 // http://localhost:8080/api/authenticate
 
-apiRoutes.post("/Upload", function(req, res) {
+apiRoutes.post("/uploadAvatar", function(req, res) {
+	console.log("upload img");
+	upload(req, res, function(err) {
+		if(err) {
 
-		upload(req, res, function(err) {
+			console.log('Error Occured'+err);
+			res.json({success: false, message:''+err});
 
-				if (err) {
+		}else{
+		console.log(req.file);
+		res.json({success: true, message:'Profile avatar updated'});
+		console.log('Photo Uploaded');
+	}
+	})
+})
 
-						res.json({success: false, message:'Update failed'});
-
-				}
-
-					res.json({success: true, message:'Update done'});
-
-		});
-
-});
 
 apiRoutes.post('/updateUser', function(req, res) {
 	console.log('mail'+req.body.mail);
@@ -155,7 +156,7 @@ apiRoutes.post('/updateUser', function(req, res) {
 					});
 				}
 				else{
-				res.json({success: false, message:'Update failed : wrong password'});
+					res.json({success: false, message:'Update failed : wrong password'});
 				}
 			}
 		}
